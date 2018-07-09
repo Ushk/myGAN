@@ -7,13 +7,14 @@ from torch import nn, optim
 from trainer import Trainer
 from networks import SimpleDiscriminator, SimpleGenerator
 from experiment import Experiment, GANExperimentStep
+from observer import GANObserver
 
 NUM_EPOCHS = 100
 BATCH_SIZE = 64
 NUM_FEATS = 100
 MNIST_DIM = 784
 IS_CONV = False
-LOG_RUNS = False
+LOG_RUNS = True
 
 
 def mnist_data():
@@ -49,13 +50,12 @@ dis_trainer = Trainer(d_optimizer, loss, dis)
 
 
 if LOG_RUNS is True:
-    # Create Save locations
+    GAN_observer = GANObserver()
 
 
-    exp_step = GANExperimentStep(BATCH_SIZE, gen_trainer, dis_trainer, step_freq=5, save_loc=log_path)
-    exp = Experiment(nepochs=NUM_EPOCHS, data_loader=data_loader, exp_step=exp_step,save_loc=cpt_path)
-
-    exp.train_model()
+exp_step = GANExperimentStep(BATCH_SIZE, gen_trainer, dis_trainer)
+exp = Experiment(nepochs=NUM_EPOCHS, data_loader=data_loader, exp_step=exp_step, observer=GAN_observer)
+exp.train_model()
 
 
 
