@@ -36,7 +36,6 @@ class Trainer:
 
         error.backward()
 
-
         return error
 
 

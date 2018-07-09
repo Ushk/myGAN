@@ -2,28 +2,23 @@ import torch
 from torch.autograd.variable import Variable
 
 import numpy as np
-import os
 
 from tqdm import tqdm
 
-from observer import GANObservable
 from ganfuncs import  create_discriminator_input_and_labels, noise
 
 
 class Experiment:
 
-    def __init__(self, nepochs, data_loader,exp_step, save_loc='./runs', save_freq=10):
-
-        assert os.path.isdir(save_loc), "{} does not exist or is not a directory".format(save_loc)
+    def __init__(self, nepochs, data_loader, exp_step, observer=None):
 
         self.num_epochs = nepochs
-        self.save_loc = save_loc
         self.data_loader = data_loader
 
-
         self.experiment_step = exp_step
-        self.save_loc = save_loc
-        self.save_freq = save_freq
+
+        self.gan_observer = observer
+
 
 
     def train_model(self):
@@ -36,8 +31,14 @@ class Experiment:
 
                 self.experiment_step.step(i, inputs, labels)
 
-                if i%self.save_freq==0:
-                    self.experiment_step.save(self.save_loc)
+                if self.gan_observer is not None:
+
+                    if i%self.gan_observer.save_frequency==0:
+                        self.gan_observer.save_model(self.experiment_step.gen_trainer.model,
+                                                     self.experiment_step.dis_trainer.model)
+
+                    self.gan_observer.update_training_metrics(self.experiment_step.log_dict)
+
 
             print(self.experiment_step.log_dict)
 
@@ -51,13 +52,11 @@ class GANExperimentStep:
     3. Logger
     """
 
-    def __init__(self,bs, generator_trainer, discriminator_trainer, step_freq, num_sample_imgs=5, save_loc='./runs/logs/'):
+    def __init__(self, bs, generator_trainer, discriminator_trainer):
         self.gen_trainer = generator_trainer
         self.dis_trainer = discriminator_trainer
 
         # Logging Vars
-        self.log_step_freq = step_freq
-        self.logger = GANObservable(save_loc)
         self.log_dict = {}
 
 
@@ -100,10 +99,6 @@ class GANExperimentStep:
         self.log_dict['gen_loss'] += error
         self.gen_trainer.optimizer.step()
 
-
-    def save(self, save_loc='./runs'):
-        torch.save(self.gen_trainer.model.state_dict(), save_loc+'gen_state_dict')
-        torch.save(self.dis_trainer.model.state_dict(), save_loc+'dis_state_dict')
 
     def reinitialize(self):
         self.log_dict['gen_loss'] = 0

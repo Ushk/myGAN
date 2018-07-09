@@ -50,13 +50,7 @@ dis_trainer = Trainer(d_optimizer, loss, dis)
 
 if LOG_RUNS is True:
     # Create Save locations
-    run_path = './runs/'+ 'run' + str(len(os.listdir('./runs'))+1)
-    cpt_path = run_path+'/cpts/'
-    log_path = run_path+'/logs/'
 
-    os.mkdir(run_path)
-    os.mkdir(cpt_path)
-    os.mkdir(log_path)
 
     exp_step = GANExperimentStep(BATCH_SIZE, gen_trainer, dis_trainer, step_freq=5, save_loc=log_path)
     exp = Experiment(nepochs=NUM_EPOCHS, data_loader=data_loader, exp_step=exp_step,save_loc=cpt_path)
