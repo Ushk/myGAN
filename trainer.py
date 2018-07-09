@@ -1,8 +1,6 @@
 import torch
-import torch.nn as nn
-import torch.functional as F
 
-
+from torch.autograd.variable import Variable
 
 
 class Trainer:
@@ -19,7 +17,7 @@ class Trainer:
         self.loss = loss
         self.model = model
 
-    def train_step(self, predictions, labels, retain=False):
+    def train_step(self, data, labels):
         """
         1. Receives predictions from ExperimentStep class
         2. Computes loss
@@ -32,12 +30,40 @@ class Trainer:
         :return: error: value of the loss on the data
         """
 
-        self.optimizer.zero_grad()
+        predictions = self.model(data)
 
         error = self.loss(predictions, labels)
 
-        error.backward(retain_graph=retain)
+        error.backward()
+
+
+        return error
+
+
+class DiscriminatorTrainer:
+
+    def __init__(self, optim, loss, model):
+        self.optimizer = optim
+        self.loss = loss
+        self.model = model
+
+    def calc_error(self, data, labs):
+
+        preds = self.model(data)
+        error = self.loss(preds, labs)
+        error.backward()
+
+
+    def train_step(self, real_data, fake_data, batch_size):
+        real_labs = Variable(torch.ones(batch_size, 1))
+        fake_labs = Variable(torch.zeros(batch_size, 1))
+
+        self.optimizer.zero_grad()
+
+        self.calc_error(real_data, real_labs)
+        self.calc_error(fake_data, fake_labs)
 
         self.optimizer.step()
 
-        return error
+
+

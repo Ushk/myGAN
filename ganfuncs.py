@@ -4,7 +4,10 @@ import torch
 from torch.autograd.variable import Variable
 
 
-def create_discriminator_input_and_labels(fake_data, real_data, batch_size):
+def create_discriminator_input_and_labels(fake_data, real_data):
+
+    batch_size = real_data.size(0)
+
     # Generate indices to sample from fake_data (generator predictions)
     sampled_fake_data_indices = nr.choice(batch_size, size=batch_size // 2, replace=False)
 
@@ -25,7 +28,7 @@ def create_discriminator_input_and_labels(fake_data, real_data, batch_size):
 
     # Shuffle the data
     disc_input=disc_input[final_indices]
-    disc_labels=disc_labels[final_indices]
+    disc_labels=disc_labels[final_indices].view(-1,1)
 
     return disc_input, disc_labels
 

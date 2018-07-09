@@ -44,24 +44,28 @@ class SimpleDiscriminator(nn.Module):
         self.leak = leak
         self.do = drop_out
 
+        self.d1_neurons = 256
+        self.d2_neurons = 128
+        self.d3_neurons = 64
+
         self.hidden0 = nn.Sequential(
-            nn.Linear(nfeatures, 1024),
+            nn.Linear(nfeatures, self.d1_neurons),
             nn.LeakyReLU(self.leak),
             nn.Dropout(self.do)
         )
         self.hidden1 = nn.Sequential(
-            nn.Linear(1024, 512),
+            nn.Linear(self.d1_neurons, self.d2_neurons),
             nn.LeakyReLU(self.leak),
             nn.Dropout(self.do)
         )
         self.hidden2 = nn.Sequential(
-            nn.Linear(512, 256),
+            nn.Linear(self.d2_neurons, self.d3_neurons),
             nn.LeakyReLU(self.leak),
             nn.Dropout(self.do)
         )
         self.out = nn.Sequential(
-            torch.nn.Linear(256,n_out), #TODO - Fix the warning regarding size here
-            torch.nn.Softmax()
+            torch.nn.Linear(self.d3_neurons,n_out), #TODO - Fix the warning regarding size here
+            torch.nn.Sigmoid()
         )
 
     def forward(self, x):
