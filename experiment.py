@@ -52,9 +52,10 @@ class GANExperimentStep:
     3. Logger
     """
 
-    def __init__(self, bs, generator_trainer, discriminator_trainer):
+    def __init__(self, bs, generator_trainer, discriminator_trainer, CUDA):
         self.gen_trainer = generator_trainer
         self.dis_trainer = discriminator_trainer
+        self.CUDA = CUDA
 
         # Logging Vars
         self.log_dict = {}
@@ -63,6 +64,9 @@ class GANExperimentStep:
     def step(self, i, inputs, labels):
 
         batch_size = inputs.size(0)
+
+        if self.CUDA:
+            inputs = inputs.cuda
 
         self.train_discriminator(batch_size, inputs)
         self.train_generator(batch_size)
@@ -90,6 +94,10 @@ class GANExperimentStep:
 
         # Generate Fake Predictions
         generator_random_input = noise(2*batch_size)
+
+        if self.CUDA:
+            generator_random_input = generator_random_input.cuda()
+
         fake_data = self.gen_trainer.model(generator_random_input)
         fake_preds = self.dis_trainer.model(fake_data)
 

@@ -39,6 +39,12 @@ data_loader = torch.utils.data.DataLoader(data, batch_size=BATCH_SIZE, shuffle=T
 gen = SimpleGenerator(NUM_FEATS, MNIST_DIM, leak=0.1)
 dis = SimpleDiscriminator(MNIST_DIM,1, leak=0.3, drop_out=0.2)
 
+if CUDA:
+    os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+    gen = gen.cuda()
+    dis = dis.cuda()
+
+
 # Optimizers
 d_optimizer = optim.Adam(dis.parameters(), lr=0.0002)
 g_optimizer = optim.Adam(gen.parameters(), lr=0.0002)
@@ -54,7 +60,7 @@ if LOG_RUNS is True:
     GAN_observer = GANObserver()
 
 
-exp_step = GANExperimentStep(BATCH_SIZE, gen_trainer, dis_trainer)
+exp_step = GANExperimentStep(BATCH_SIZE, gen_trainer, dis_trainer, CUDA)
 exp = Experiment(nepochs=NUM_EPOCHS, data_loader=data_loader, exp_step=exp_step, observer=GAN_observer)
 exp.train_model()
 
