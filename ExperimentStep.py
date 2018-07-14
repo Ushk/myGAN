@@ -98,7 +98,7 @@ class GANExperimentStep:
             generator_random_input = noise(test_outputs).cuda()
             fake_data = self.gen_trainer.model(generator_random_input).cuda()
 
-        fake_data = fake_data.view(-1, 28, 28)
+        fake_data = fake_data.view(-1,1,28, 28).data
         return fake_data
 
 

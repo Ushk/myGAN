@@ -32,9 +32,7 @@ class Experiment:
                         val_images = self.experiment_step.validation_step()
                         self.gan_observer.update_images(val_images, epoch)
 
-                    self.gan_observer.update_training_metrics(self.experiment_step.log_dict)
-
-
+            self.gan_observer.update_training_metrics(self.experiment_step.log_dict)
             print(self.experiment_step.log_dict)
 
 

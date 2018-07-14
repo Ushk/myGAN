@@ -34,6 +34,7 @@ class GANObserver(Observable):
         """
         """
         for log_key, log_scalar in log_dict.items():
+            #print(log_key, log_scalar)
             self.writer.add_scalar(self.run_path +log_key, log_scalar)
 
 
@@ -42,7 +43,8 @@ class GANObserver(Observable):
         torch.save(discriminator_model.state_dict(), self.cpt_path + 'dis_state_dict')
 
     def update_images(self, validation_images, epoch):
-        x = vutils.make_grid(validation_images, normalize=True, scale_each=True)
+        #print(type(validation_images), validation_images.size())
+        x = vutils.make_grid(validation_images, normalize=True)
         self.writer.add_image('Image', x, epoch)
 
 
