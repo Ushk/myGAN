@@ -39,30 +39,7 @@ class Trainer:
         return error
 
 
-class DiscriminatorTrainer:
 
-    def __init__(self, optim, loss, model):
-        self.optimizer = optim
-        self.loss = loss
-        self.model = model
-
-    def calc_error(self, data, labs):
-
-        preds = self.model(data)
-        error = self.loss(preds, labs)
-        error.backward()
-
-
-    def train_step(self, real_data, fake_data, batch_size):
-        real_labs = Variable(torch.ones(batch_size, 1))
-        fake_labs = Variable(torch.zeros(batch_size, 1))
-
-        self.optimizer.zero_grad()
-
-        self.calc_error(real_data, real_labs)
-        self.calc_error(fake_data, fake_labs)
-
-        self.optimizer.step()
 
 
 

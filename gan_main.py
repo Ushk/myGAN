@@ -14,7 +14,8 @@ BATCH_SIZE = 64
 NUM_FEATS = 100
 MNIST_DIM = 784
 IS_CONV = False
-LOG_RUNS = True
+LOG_RUNS = False
+CUDA = False
 
 
 def mnist_data():
@@ -48,7 +49,7 @@ loss = nn.BCELoss()
 gen_trainer = Trainer(g_optimizer, loss, gen)
 dis_trainer = Trainer(d_optimizer, loss, dis)
 
-
+GAN_observer = None
 if LOG_RUNS is True:
     GAN_observer = GANObserver()
 
