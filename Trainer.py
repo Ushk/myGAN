@@ -1,11 +1,12 @@
 import torch
+from torch import nn, optim
 
 from torch.autograd.variable import Variable
 
 
 class Trainer:
 
-    def __init__(self, optim, loss, model):
+    def __init__(self, model, lr, gpu=None):
         """
         Trainer class. The trainer class *has a* model. It handles the training logic. It should not need to know
         the internals of the model.
@@ -13,9 +14,14 @@ class Trainer:
         :param loss:
         :param model:
         """
-        self.optimizer = optim
-        self.loss = loss
+        self.loss = nn.BCELoss()
         self.model = model
+        self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
+
+        if torch.cuda.is_available():
+            self.model = self.model.cuda()
+
+
 
     def train_step(self, data, labels):
         """
@@ -37,6 +43,11 @@ class Trainer:
         error.backward()
 
         return error
+
+
+
+
+
 
 
 

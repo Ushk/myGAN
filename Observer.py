@@ -1,6 +1,7 @@
 from tensorboardX import SummaryWriter
 import torch
 import os
+import torchvision.utils as vutils
 
 class Observable:
 #
@@ -39,6 +40,11 @@ class GANObserver(Observable):
     def save_model(self, generator_model, discriminator_model):
         torch.save(generator_model.state_dict(), self.cpt_path + 'gen_state_dict')
         torch.save(discriminator_model.state_dict(), self.cpt_path + 'dis_state_dict')
+
+    def update_images(self, validation_images, epoch):
+        x = vutils.make_grid(validation_images, normalize=True, scale_each=True)
+        self.writer.add_image('Image', x, epoch)
+
 
 
 
