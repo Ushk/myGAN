@@ -14,9 +14,8 @@ BATCH_SIZE = 64
 NUM_FEATS = 100
 MNIST_DIM = 784
 IS_CONV = False
-LOG_RUNS = False
-CUDA = False
-
+LOG_RUNS = True
+CUDA = True
 
 def mnist_data():
     transform_list = [transforms.ToTensor(),

@@ -66,7 +66,7 @@ class GANExperimentStep:
         batch_size = inputs.size(0)
 
         if self.CUDA:
-            inputs = inputs.cuda
+            inputs = inputs.cuda()
 
         self.train_discriminator(batch_size, inputs)
         self.train_generator(batch_size)
@@ -79,12 +79,12 @@ class GANExperimentStep:
         self.dis_trainer.optimizer.zero_grad()
 
         #Train Discriminator on Real Data
-        self.log_dict['dis_loss'] += self.dis_trainer.train_step(inputs, Variable(torch.ones(batch_size, 1)))
+        self.log_dict['dis_loss'] += self.dis_trainer.train_step(inputs, Variable(torch.ones(batch_size, 1)).cuda())
 
         # Train Discriminator on Fake Data
         generator_random_input = noise(batch_size)
-        dis_fake_data = self.gen_trainer.model(generator_random_input)
-        self.log_dict['dis_loss'] += self.dis_trainer.train_step(dis_fake_data, Variable(torch.zeros(batch_size, 1)))
+        dis_fake_data = self.gen_trainer.model(generator_random_input.cuda())
+        self.log_dict['dis_loss'] += self.dis_trainer.train_step(dis_fake_data, Variable(torch.zeros(batch_size, 1)).cuda())
         self.dis_trainer.optimizer.step()
 
     def train_generator(self, batch_size):
@@ -99,10 +99,10 @@ class GANExperimentStep:
             generator_random_input = generator_random_input.cuda()
 
         fake_data = self.gen_trainer.model(generator_random_input)
-        fake_preds = self.dis_trainer.model(fake_data)
+        fake_preds = self.dis_trainer.model(fake_data.cuda())
 
         # Calculate error and update
-        error = self.gen_trainer.loss(fake_preds, Variable(torch.ones(2*batch_size, 1)))
+        error = self.gen_trainer.loss(fake_preds, Variable(torch.ones(2*batch_size, 1)).cuda())
         error.backward()
         self.log_dict['gen_loss'] += error
         self.gen_trainer.optimizer.step()
