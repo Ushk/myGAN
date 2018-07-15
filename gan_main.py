@@ -15,9 +15,7 @@ from NetworkProperties import NetworkProperties
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 NUM_EPOCHS = 100
 BATCH_SIZE = 64
-
-IS_CONV = False
-LOG_RUNS = False
+LOG_RUNS = True
 lr = 0.0002
 
 def mnist_data():
