@@ -36,5 +36,4 @@ def noise(size):
     '''
     Generates a 1D vector of gaussian sampled random values
     '''
-    n = Variable(torch.randn(size, 100))
-    return n
+    pass

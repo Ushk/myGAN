@@ -1,3 +1,4 @@
+import numpy as np
 import torch.nn as nn
 
 class SimpleDiscriminator(nn.Module):
@@ -12,8 +13,10 @@ class SimpleDiscriminator(nn.Module):
         self.d2_neurons = 128
         self.d3_neurons = 64
 
+        self.nfeatures = int(np.prod(nfeatures[1:])) # TODO - Hacky, can this be fixed?
+
         self.hidden0 = nn.Sequential(
-            nn.Linear(nfeatures, self.d1_neurons),
+            nn.Linear(self.nfeatures, self.d1_neurons),
             nn.LeakyReLU(self.leak),
             nn.Dropout(self.do)
         )
@@ -33,6 +36,7 @@ class SimpleDiscriminator(nn.Module):
         )
 
     def forward(self, x):
+        x = x.view(x.size(0), -1)
         x = self.hidden0(x)
         x = self.hidden1(x)
         x = self.hidden2(x)

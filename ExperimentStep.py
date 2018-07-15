@@ -1,7 +1,5 @@
 import torch
 from torch.autograd.variable import Variable
-
-import numpy as np
 from ganfuncs import  create_discriminator_input_and_labels, noise
 
 class GANExperimentStep:
@@ -13,46 +11,49 @@ class GANExperimentStep:
     3. Logger
     """
 
-    def __init__(self, bs, generator_trainer, discriminator_trainer):
+    def __init__(self, generator_trainer, discriminator_trainer, features):
         self.gen_trainer = generator_trainer
         self.dis_trainer = discriminator_trainer
 
+        # Noise shape for generator
+        # If 1, should be passed to NN with linear first layer, i.e the data is flattened
+        # If 3, should have format (C,H,W)
+        assert len(tuple(features)) in (1,3), 'Invalid Feature dimension'
+        self.input_features = features
+
         # Logging Vars
         self.log_dict = {}
+
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() is not False else "cpu")
 
 
     def step(self, i, inputs, labels):
 
         batch_size = inputs.size(0)
 
-        if torch.cuda.is_available():
-            inputs = inputs.cuda()
+        inputs = inputs.to(self.device)
 
         self.train_discriminator(batch_size, inputs)
         self.train_generator(batch_size)
 
-        self.log_dict['loss_delta'] += np.abs(self.log_dict['gen_loss'].data - self.log_dict['dis_loss'].data)/batch_size
+        self.log_dict['loss_delta'] += self.log_dict['gen_loss'].data - self.log_dict['dis_loss'].data/batch_size
 
 
     def train_discriminator(self, batch_size, inputs):
 
         self.dis_trainer.optimizer.zero_grad()
 
-        if torch.cuda.is_available():
-            real_targets = Variable(torch.ones(batch_size, 1)).cuda()
-            fake_targets = Variable(torch.zeros(batch_size, 1)).cuda()
-            generator_random_input = noise(batch_size).cuda()
 
-        else:
-            real_targets = Variable(torch.ones(batch_size, 1))
-            fake_targets = Variable(torch.zeros(batch_size, 1))
-            generator_random_input = noise(batch_size)
+        real_targets = Variable(torch.ones(batch_size, 1, device=self.device))
+        fake_targets = Variable(torch.zeros(batch_size, 1, device=self.device))
+        generator_random_input = Variable(torch.randn(batch_size, *self.input_features, device=self.device))
+
 
         #Train Discriminator on Real Data
         self.log_dict['dis_loss'] += self.dis_trainer.train_step(inputs, real_targets)
 
         # Train Discriminator on Fake Data
-        dis_fake_data = self.gen_trainer.model(generator_random_input.cuda())
+        dis_fake_data = self.gen_trainer.model(generator_random_input)
         self.log_dict['dis_loss'] += self.dis_trainer.train_step(dis_fake_data, fake_targets)
 
         #Update Discriminator Weights
@@ -64,15 +65,9 @@ class GANExperimentStep:
         self.gen_trainer.optimizer.zero_grad()
 
         # Generate Fake Predictions
-        if torch.cuda.is_available():
-            generator_random_input = noise(2 * batch_size).cuda()
-            fake_data = self.gen_trainer.model(generator_random_input).cuda()
-            generator_targets = Variable(torch.ones(2*batch_size, 1)).cuda()
-
-        else:
-            generator_random_input = noise(2 * batch_size)
-            fake_data = self.gen_trainer.model(generator_random_input)
-            generator_targets = Variable(torch.ones(2 * batch_size, 1))
+        generator_random_input = Variable(torch.randn(2*batch_size, *self.input_features, device=self.device))
+        fake_data = self.gen_trainer.model(generator_random_input)
+        generator_targets = Variable(torch.ones(2 * batch_size, 1, device=self.device) )
 
 
         fake_preds = self.dis_trainer.model(fake_data)
@@ -91,14 +86,11 @@ class GANExperimentStep:
 
     def validation_step(self, test_outputs=10):
 
-        if torch.cuda.is_available():
-            generator_random_input = noise(test_outputs).cuda()
-            fake_data = self.gen_trainer.model(generator_random_input).cuda()
-        else:
-            generator_random_input = noise(test_outputs).cuda()
-            fake_data = self.gen_trainer.model(generator_random_input).cuda()
 
-        fake_data = fake_data.view(-1,1,28, 28).data
+        generator_random_input = Variable(torch.randn(test_outputs, *self.input_features, device=self.device))
+        fake_data = self.gen_trainer.model(generator_random_input)
+
+        # fake_data = fake_data.view(-1,1,28, 28).data
         return fake_data
 
 

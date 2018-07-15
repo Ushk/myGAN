@@ -18,7 +18,7 @@ class Trainer:
         self.model = model
         self.optimizer = optim.Adam(self.model.parameters(), lr=lr)
 
-        if torch.cuda.is_available():
+        if torch.cuda.is_available() is not False:
             self.model = self.model.cuda()
 
 
@@ -35,7 +35,6 @@ class Trainer:
         :param labels: appropriate data for the model
         :return: error: value of the loss on the data
         """
-
         predictions = self.model(data)
 
         error = self.loss(predictions, labels)
