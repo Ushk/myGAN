@@ -24,15 +24,15 @@ class Experiment:
 
                 self.experiment_step.step(i, inputs, labels)
 
-                if (self.gan_observer is not None) & (epoch != 0):
+            if (self.gan_observer is not None) & (epoch != 0):
 
-                    if i%self.gan_observer.save_frequency==0:
-                        self.gan_observer.save_model(self.experiment_step.gen_trainer.model,
-                                                     self.experiment_step.dis_trainer.model)
-                        val_images = self.experiment_step.validation_step()
-                        self.gan_observer.update_images(val_images, epoch)
+                if i%self.gan_observer.save_frequency==0:
+                    self.gan_observer.save_model(self.experiment_step.gen_trainer.model,
+                                                 self.experiment_step.dis_trainer.model)
+                    val_images = self.experiment_step.validation_step()
+                    self.gan_observer.update_images(val_images, epoch)
 
-            self.gan_observer.update_training_metrics(self.experiment_step.log_dict, epoch)
+                self.gan_observer.update_training_metrics(self.experiment_step.log_dict, epoch)
             print(self.experiment_step.log_dict)
 
 
