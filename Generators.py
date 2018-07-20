@@ -16,8 +16,9 @@ class SimpleGenerator(nn.Module):
 
         assert type(nfeatures)==tuple, 'The nfeatures parameter should be a tuple with the input vector dimensions,' \
                                        'currently has type'.format(type(tuple))
-        self.nfeatures = nfeatures[0]
-        self.noutputs = int(np.prod(n_out[1:]))  # TODO - Hacky, can this be fixed?
+        self.nfeatures = int(np.prod(nfeatures[1:]))
+        self.output_shape = n_out
+        self.noutput_neurons = int(np.prod(n_out[1:]))  # TODO - Hacky, can this be fixed?
 
         self.hidden0 = nn.Sequential(
             nn.Linear(self.nfeatures, self.g1_neurons),
@@ -33,7 +34,7 @@ class SimpleGenerator(nn.Module):
         )
 
         self.out = nn.Sequential(
-            nn.Linear(self.g3_neurons, self.noutputs),
+            nn.Linear(self.g3_neurons, self.noutput_neurons),
             nn.Tanh()
         )
 
@@ -43,6 +44,7 @@ class SimpleGenerator(nn.Module):
         x = self.hidden1(x)
         x = self.hidden2(x)
         x = self.out(x)
+        x = x.view(-1, *self.output_shape)
         return x
 
 
