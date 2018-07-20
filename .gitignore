@@ -1,5 +1,6 @@
 **/dataset
 **/runs
 **/venv
-.idea/
+**/.idea/
 **/__pycache/
+.*

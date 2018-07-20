@@ -72,25 +72,30 @@ class ConvolutionalGenerator(nn.Module):
 
         self.hidden0 = nn.Sequential(
             nn.ConvTranspose2d(self.initial_dimensions[0], self.h0['channels'], self.h0['kdim'], self.h0['stride'], self.h0['padding']),
-            nn.LeakyReLU(self.leak)
+            nn.LeakyReLU(self.leak),
+            nn.BatchNorm2d(self.h0['channels'])
         )
         # Assuming an input with (H,W) = (1,1), activations should now be (-1, 512, 3, 3)
 
         self.hidden1 = nn.Sequential(
             nn.ConvTranspose2d(self.h0['channels'], self.h1['channels'], self.h1['kdim'], self.h1['stride'], self.h1['padding']),
-            nn.LeakyReLU(self.leak)
+            nn.LeakyReLU(self.leak),
+            nn.BatchNorm2d(self.h1['channels'])
         )
         # Output should now be (-1, 256, 6, 6)
 
         self.hidden2 = nn.Sequential(
             nn.ConvTranspose2d(self.h1['channels'], self.h2['channels'], self.h2['kdim'], self.h2['stride'], self.h2['padding']),
-            nn.LeakyReLU(self.leak)
+            nn.LeakyReLU(self.leak),
+            nn.BatchNorm2d(self.h2['channels'])
+
         )
         # Output should now be (-1, 128, 12, 12)
 
         self.hidden3 = nn.Sequential(
             nn.ConvTranspose2d(self.h2['channels'], self.h3['channels'], self.h2['kdim'], self.h2['stride'], self.h2['padding']),
-            nn.LeakyReLU(self.leak)
+            nn.LeakyReLU(self.leak),
+            nn.BatchNorm2d(self.h3['channels'])
         )
 
         self.out = nn.Sequential(

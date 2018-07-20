@@ -35,7 +35,7 @@ class GANObserver(Observable):
         """
         for log_key, log_scalar in log_dict.items():
             # print(log_key, log_scalar)
-            self.writer.add_scalar(self.run_path + log_key, log_scalar)
+            self.writer.add_scalar(self.run_path + log_key, log_scalar, epoch)
         # self.writer.add_scalars(self.run_path, log_dict, epoch)
 
 
