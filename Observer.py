@@ -45,7 +45,7 @@ class GANObserver(Observable):
 
     def update_images(self, validation_images, epoch):
         #print(type(validation_images), validation_images.size())
-        #print(, validation_images.max())
+        print(validation_images.max())
         x = vutils.make_grid(validation_images, normalize=True, range=(float(validation_images.min()),float(validation_images.max())))
         self.writer.add_image('Image', x, epoch)
 

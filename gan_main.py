@@ -46,7 +46,7 @@ dis_trainer = Trainer(dis, lr)
 
 GAN_observer = None
 if LOG_RUNS is True:
-    GAN_observer = GANObserver()
+    GAN_observer = GANObserver(1)
 
 
 exp_step = GANExperimentStep(gen_trainer, dis_trainer, NUM_FEATS)
