@@ -4,7 +4,7 @@ import os
 from torchvision import transforms, datasets
 
 from Generators import  SimpleGenerator, ConvolutionalGenerator
-from Discriminators import SimpleDiscriminator
+from Discriminators import SimpleDiscriminator, ConvolutionalDiscriminator
 from Trainer import Trainer
 
 from Experiment import Experiment
@@ -15,7 +15,7 @@ from NetworkProperties import NetworkProperties
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 NUM_EPOCHS = 100
 BATCH_SIZE = 64
-LOG_RUNS = True
+LOG_RUNS = False
 lr = 0.0002
 
 def mnist_data():
@@ -37,7 +37,7 @@ NUM_FEATS = (100,1,1)
 MNIST_DIM=(1,28,28)
 
 gen = ConvolutionalGenerator(NUM_FEATS, MNIST_DIM, leak=0.1)
-dis = SimpleDiscriminator(MNIST_DIM,1, leak=0.3, drop_out=0.2)
+dis = ConvolutionalDiscriminator(MNIST_DIM,1, leak=0.3)
 
 
 # Create Trainers
