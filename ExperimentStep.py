@@ -36,7 +36,7 @@ class GANExperimentStep:
         self.train_discriminator(batch_size, inputs)
         for i in range(3): self.train_generator(batch_size)
 
-        self.log_dict['loss_delta'] += self.log_dict['gen_loss'].data - self.log_dict['dis_loss'].data/batch_size
+        self.log_dict['loss_delta'] += (self.log_dict['gen_loss'].data/3 - self.log_dict['dis_loss'].data)/batch_size
 
 
     def train_discriminator(self, batch_size, inputs):
@@ -50,11 +50,11 @@ class GANExperimentStep:
 
 
         #Train Discriminator on Real Data
-        self.log_dict['dis_loss'] += self.dis_trainer.train_step(inputs, real_targets)
+        self.log_dict['dis_loss'] += self.dis_trainer.train_step(inputs, real_targets)/batch_size
 
         # Train Discriminator on Fake Data
         dis_fake_data = self.gen_trainer.model(generator_random_input)
-        self.log_dict['dis_loss'] += self.dis_trainer.train_step(dis_fake_data, fake_targets)
+        self.log_dict['dis_loss'] += self.dis_trainer.train_step(dis_fake_data, fake_targets)/batch_size
 
         #Update Discriminator Weights
         self.dis_trainer.optimizer.step()
@@ -75,7 +75,7 @@ class GANExperimentStep:
         # Calculate error and update
         error = self.gen_trainer.loss(fake_preds, generator_targets)
         error.backward()
-        self.log_dict['gen_loss'] += error
+        self.log_dict['gen_loss'] += error/batch_size
         self.gen_trainer.optimizer.step()
 
 
