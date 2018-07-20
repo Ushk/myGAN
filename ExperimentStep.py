@@ -34,7 +34,7 @@ class GANExperimentStep:
         inputs = inputs.to(self.device)
 
         self.train_discriminator(batch_size, inputs)
-        self.train_generator(batch_size)
+        for i in range(3): self.train_generator(batch_size)
 
         self.log_dict['loss_delta'] += self.log_dict['gen_loss'].data - self.log_dict['dis_loss'].data/batch_size
 

@@ -33,9 +33,10 @@ class GANObserver(Observable):
     def update_training_metrics(self, log_dict, epoch):
         """
         """
-        # for log_key, log_scalar in log_dict.items():
-            #print(log_key, log_scalar)
-        self.writer.add_scalars(self.run_path, log_dict, epoch)
+        for log_key, log_scalar in log_dict.items():
+            # print(log_key, log_scalar)
+            self.writer.add_scalar(self.run_path + log_key, log_scalar)
+        # self.writer.add_scalars(self.run_path, log_dict, epoch)
 
 
     def save_model(self, generator_model, discriminator_model):
