@@ -14,6 +14,7 @@ class GANExperimentStep:
     def __init__(self, generator_trainer, discriminator_trainer, features):
         self.gen_trainer = generator_trainer
         self.dis_trainer = discriminator_trainer
+        self.epoch = 0
 
         # Noise shape for generator
         # If 1, should be passed to NN with linear first layer, i.e the data is flattened
@@ -27,7 +28,8 @@ class GANExperimentStep:
         self.device = torch.device("cuda:0" if torch.cuda.is_available() is not False else "cpu")
 
 
-    def step(self, i, inputs, labels):
+    def step(self, epoch, inputs, labels):
+        self.epoch = epoch + 1
 
         batch_size = inputs.size(0)
 
@@ -48,12 +50,14 @@ class GANExperimentStep:
         fake_targets = Variable(torch.zeros(batch_size, 1, device=self.device))
         generator_random_input = Variable(torch.randn(batch_size, *self.input_features, device=self.device))
 
+        inputs = max(0, (10-self.epoch)/self.epoch)*torch.randn_like(inputs) + inputs
 
         #Train Discriminator on Real Data
         self.log_dict['dis_loss'] += self.dis_trainer.train_step(inputs, real_targets)/batch_size
 
         # Train Discriminator on Fake Data
         dis_fake_data = self.gen_trainer.model(generator_random_input)
+        dis_fake_data = max(0, (10 - self.epoch) / self.epoch) * torch.randn_like(dis_fake_data) + dis_fake_data
         self.log_dict['dis_loss'] += self.dis_trainer.train_step(dis_fake_data, fake_targets)/batch_size
 
         #Update Discriminator Weights
