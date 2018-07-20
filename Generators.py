@@ -65,9 +65,9 @@ class ConvolutionalGenerator(nn.Module):
 
         self.kdim = 3
 
-        self.h0 = {'channels': 128, 'kdim': self.kdim, 'stride': 1, 'padding': 0}
-        self.h1 = {'channels': 64, 'kdim': self.kdim, 'stride': 1, 'padding': 0}
-        self.h2 = {'channels': 32, 'kdim': self.kdim, 'stride': 2, 'padding': 1}
+        self.h0 = {'channels': 512, 'kdim': self.kdim, 'stride': 2, 'padding': 0}
+        self.h1 = {'channels': 256, 'kdim': self.kdim, 'stride': 2, 'padding': 0}
+        self.h2 = {'channels': 128, 'kdim': self.kdim, 'stride': 2, 'padding': 1}
         self.h3 = {'channels': self.output_vector_dims[0], 'kdim': self.kdim, 'stride': 2, 'padding': 1}
 
         self.leak = leak

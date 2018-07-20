@@ -33,7 +33,7 @@ data = mnist_data()
 data_loader = torch.utils.data.DataLoader(data, batch_size=BATCH_SIZE, shuffle=True)
 
 # Create Networks
-NUM_FEATS = (1,10,10)
+NUM_FEATS = (25,4,4)
 MNIST_DIM=(1,28,28)
 
 gen = ConvolutionalGenerator(NUM_FEATS, MNIST_DIM, leak=0.1)
