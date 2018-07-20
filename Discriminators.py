@@ -59,12 +59,12 @@ class ConvolutionalDiscriminator(nn.Module):
 
         self.kdim = 3
 
-        self.h0 = {'channels': 128, 'kdim': self.kdim, 'stride': 1, 'padding': 1}
-        self.h1 = {'channels': 64, 'kdim': self.kdim, 'stride': 2, 'padding': 1}
-        self.h2 = {'channels': 32, 'kdim': self.kdim, 'stride': 2, 'padding': 1}
-        self.h3 = {'channels': 32, 'kdim': self.kdim, 'stride': 1, 'padding': 1}
+        self.h0 = {'channels': 32, 'kdim': self.kdim, 'stride': 1, 'padding': 1}
+        self.h1 = {'channels': 16, 'kdim': self.kdim, 'stride': 2, 'padding': 1}
+        # self.h2 = {'channels': 32, 'kdim': self.kdim, 'stride': 2, 'padding': 1}
+        # self.h3 = {'channels': 32, 'kdim': self.kdim, 'stride': 1, 'padding': 1}
 
-        total_down_fac = np.prod([layer['stride'] for layer in (self.h0, self.h1, self.h2, self.h3)])
+        total_down_fac = np.prod([layer['stride'] for layer in (self.h0, self.h1)])#, self.h2, self.h3)])
 
         self.leak = leak
 
@@ -81,20 +81,20 @@ class ConvolutionalDiscriminator(nn.Module):
         )
         # MNIST: Output should now be (-1, 128, 14, 14)
 
-        self.hidden2 = nn.Sequential(
-            nn.Conv2d(self.h1['channels'], self.h2['channels'], self.h2['kdim'], self.h2['stride'], self.h2['padding']),
-            nn.LeakyReLU(self.leak)
-        )
-        # MNIST: Output should now be (-1, 64, 7, 7)
-
-        self.hidden3 = nn.Sequential(
-            nn.Conv2d(self.h2['channels'], self.h3['channels'], self.h3['kdim'], self.h3['stride'], self.h3['padding']),
-            nn.LeakyReLU(self.leak)
-        )
+        # self.hidden2 = nn.Sequential(
+        #     nn.Conv2d(self.h1['channels'], self.h2['channels'], self.h2['kdim'], self.h2['stride'], self.h2['padding']),
+        #     nn.LeakyReLU(self.leak)
+        # )
+        # # MNIST: Output should now be (-1, 64, 7, 7)
+        #
+        # self.hidden3 = nn.Sequential(
+        #     nn.Conv2d(self.h2['channels'], self.h3['channels'], self.h3['kdim'], self.h3['stride'], self.h3['padding']),
+        #     nn.LeakyReLU(self.leak)
+        # )
         # MNIST: Output should now be (-1, 64, 7, 7)
 
         self.out = nn.Sequential(
-            nn.Linear(self.h3['channels']*(self.initial_dimensions[1]*self.initial_dimensions[2])//(total_down_fac**2),1),
+            nn.Linear(self.h1['channels']*(self.initial_dimensions[1]*self.initial_dimensions[2])//(total_down_fac**2),1),
             nn.Sigmoid()
         )
         # For an MNIST experiment output should now be (-1, 1, 28, 28)
