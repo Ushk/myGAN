@@ -33,7 +33,7 @@ class Experiment:
                     self.gan_observer.update_images(val_images, epoch)
 
                 self.gan_observer.update_training_metrics(self.experiment_step.log_dict, epoch)
-            print(epoch, [(key, value.data) for key, value in self.experiment_step.log_dict])
+            print(epoch, [(key, value.data[0]) for key, value in self.experiment_step.log_dict.items()])
 
 
 
